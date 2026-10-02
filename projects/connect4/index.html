@@ -31,7 +31,7 @@
 <p>Head-to-head improvements did not tell the whole story. Inspecting the empty-board policy revealed a strong preference for one corner, even though the four corners are equivalent under the board’s symmetries. Diversifying the seed positions and adding symmetry augmentation made the opening distribution much more balanced.</p>
 <figure>
   <a href="/assets/projects/connect4/policy-symmetry-idealised.png"><img src="/assets/projects/connect4/policy-symmetry-idealised.png" alt="Left: the original policy, with 70.76 percent on one corner. Right: an idealised illustration with 25 percent on each corner and zero on every other position." loading="lazy"></a>
-  <figcaption>Adapted from slide 9. Left: the original measured opening policy. Right: an idealised corner-symmetric distribution, with 25% on each corner and 0% elsewhere—not a measured checkpoint. Value annotations are retained from the original figure.</figcaption>
+  <figcaption>Adapted from slide 9. Left: the original measured opening policy. Right: an idealised corner-symmetric distribution, with 25% on each corner and 0% elsewhere—not a measured checkpoint.</figcaption>
 </figure>
 <h2>Evaluating improvement</h2>
 <p>I compared checkpoints with their predecessors, the starting model, and depth-limited alpha-beta opponents. These tests sometimes disagreed: a checkpoint could improve against the starting model while failing the promotion threshold against its predecessor. This made a single rolling opponent an unreliable summary of progress.</p>

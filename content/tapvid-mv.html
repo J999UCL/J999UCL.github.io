@@ -1,0 +1,14 @@
+<p>I co-authored <a href="https://arxiv.org/abs/2609.01899">TAPVid-MV</a>, a benchmark for tracking a physical point in 3D across several synchronized videos. The cameras can move independently, and the point can become hidden in one view while remaining visible in another.</p>
+<h2>The benchmark</h2>
+<p>The release contains 284 sequences, 1,142 camera streams and 109,769 ground-truth trajectories across seven subsets. They cover robotics, human activity, driving and procedural scenes. Evaluation considers the query camera, other cameras and a shared world frame, alongside reconstruction quality.</p>
+<p>This distinction matters: a poor 3D trajectory can come from incorrect correspondence, inaccurate geometry, or both. Evaluating tracking and reconstruction together helps separate these effects.</p>
+<h2>My contribution</h2>
+<p>My work focused on <a href="/projects/perpetua/">Perpetua’s synthetic-data pipeline</a> and <a href="/projects/mv-tracker++/">fine-tuning MVTracker</a>. Those pages describe the implementation, training recipe, and results.</p>
+<h2>Explore the data</h2>
+<p>The paper’s released Rerun recordings let you inspect cameras, videos and point tracks interactively. Open the recording index to choose a sequence, or start with the Perpetua dining room.</p>
+<ul>
+<li><a href="https://tapvidmv.github.io/">Official project page</a></li>
+<li><a href="https://arxiv.org/abs/2609.01899">Read the paper</a></li>
+<li><a href="https://storage.googleapis.com/dm-tapnet/tapvidmv/rrd/index.html">Browse the paper’s interactive recordings (.rrd)</a></li>
+<li><a href="https://app.rerun.io/version/0.35.0/index.html?url=https%3A%2F%2Fstorage.googleapis.com%2Fdm-tapnet%2Ftapvidmv%2Frrd%2Fperpetua%2Fdiningroom04.rrd">Open the Perpetua dining-room recording</a></li>
+</ul>

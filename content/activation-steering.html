@@ -1,0 +1,7 @@
+<p>I built a workflow for contrastive activation steering in local Qwen language models. Instead of updating model weights, the system changes internal activations during inference, allowing a concept-specific direction to influence the generated response.</p>
+<h2>From examples to a steering direction</h2>
+<p>The workflow starts by generating positive and negative examples for a chosen concept. It runs these examples through the model and extracts hidden states at different transformer layers. For each layer, it computes the difference between the mean positive and negative activations, then normalizes that difference to produce a steering vector.</p>
+<p>This turns a collection of contrasting examples into a direction in the model’s internal representation space. Injecting that direction during generation provides a way to test how the representation relates to behaviour, without carrying out another round of model training.</p>
+<h2>Comparing intervention sites</h2>
+<p>I implemented both single-layer and multi-layer interventions, with returned metadata to support comparisons between layer choices. The automation joins example generation, activation extraction, direction construction and inference-time intervention into one experimental workflow.</p>
+<p>The project focuses on making these interventions easy to construct and inspect. A steering direction should be treated as a behaviour probe rather than a guarantee that a concept has been isolated: its effects can depend on the examples, the layer and the prompt.</p>

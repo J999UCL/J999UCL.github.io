@@ -1,0 +1,29 @@
+<p>I built Perpetua at UCL PRISM to generate synthetic videos for multi-view point tracking. The aim is to follow the same physical point through time, even as people move, cameras change viewpoint, and objects disappear behind one another. A procedural scene gives us access to the geometry and motion needed to produce those labels.</p>
+
+<figure>
+  <video controls playsinline preload="none" poster="/assets/projects/perpetua/diningroom04.jpg" aria-label="Three synchronized views of a Perpetua dining-room render">
+    <source src="/assets/projects/perpetua/diningroom04.mp4" type="video/mp4">
+    <a href="/assets/projects/perpetua/diningroom04.mp4">Download the render</a>.
+  </video>
+  <figcaption>Eight seconds from a Perpetua dining-room scene, showing cameras 0, 2 and 3 side by side. This is a rendered sequence, not a model prediction.</figcaption>
+</figure>
+
+<h2>From a scene to a usable sequence</h2>
+<p>The pipeline combines procedurally generated environments, animated people, camera planning, rendering and track annotation. My main work was making actor and camera motion respect the scene. Actor routes start from scene-aware random walks, then undergo gradient-based optimisation. The objective balances clearance from obstacles, separation between people, speed and acceleration; the resulting paths are checked before downstream stages use them. Camera trajectories are optimised separately against scene geometry.</p>
+
+<figure>
+  <a href="/assets/projects/perpetua/actor-routes.png"><img src="/assets/projects/perpetua/actor-routes.png" alt="Top-down plot of four independently planned actor routes within a generated living room; grey regions mark non-walkable space." loading="lazy" width="1360" height="1156"></a>
+  <figcaption>A route-planning example replotted from saved trajectories. Circles mark starts and crosses mark ends. <a href="/assets/projects/perpetua/route-preview-original.png">Original pipeline preview</a>.</figcaption>
+</figure>
+
+<p>Rendering and annotation share calibrated cameras and scene geometry. Static points come from depth, while points on people follow saved surface attachments. Visibility tests combine depth and object identity, so the labels describe when a point is actually observable in each view. The output includes RGB, depth, camera calibration, 3D trajectories and visibility annotations.</p>
+
+<h2>Making generation repeatable</h2>
+<p>I also worked on the practical pipeline: validated stage outputs, resumable rendering and cloud execution. My initial GCP generation run produced 350 scenes with a 100% scene-generation success rate. That is a result for that run, rather than a claim that every possible configuration succeeds. Separating scene generation, rendering and annotation makes it possible to inspect an intermediate result and reuse it without repeating every stage.</p>
+
+<p>Perpetua is one of the datasets in <a href="https://arxiv.org/abs/2609.01899">TAPVid-MV</a>, which I co-authored. You can inspect the dining-room sequence in 3D, including cameras and ground-truth tracks, through the released Rerun recording.</p>
+<ul>
+  <li><a href="https://app.rerun.io/version/0.35.0/index.html?url=https%3A%2F%2Fstorage.googleapis.com%2Fdm-tapnet%2Ftapvidmv%2Frrd%2Fperpetua%2Fdiningroom04.rrd">Open the interactive 3D recording</a></li>
+  <li><a href="https://storage.googleapis.com/dm-tapnet/tapvidmv/rrd/perpetua/diningroom04.rrd">Download diningroom04.rrd (about 52 MB)</a></li>
+  <li><a href="https://storage.googleapis.com/dm-tapnet/tapvidmv/rrd/index.html#perpetua">Browse the Perpetua recordings</a></li>
+</ul>

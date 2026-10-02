@@ -1,0 +1,9 @@
+<p>During my software engineering internship at Loby, a roommate-matching app, I worked on backend behaviour and a model for recommending potential roommates. The two parts addressed a related problem: useful recommendations depend both on reliable profile data and on learning which attributes matter to a particular user.</p>
+
+<h2>Backend consistency</h2>
+<p>I developed Flask and SQLAlchemy features and fixed inconsistencies between stored values and the income, age and rent ranges displayed to users. I also wrote unit and integration tests for API behaviour. This work focused on making the application’s handling of profile information consistent across its storage and presentation layers.</p>
+
+<h2>Learning from previous matches</h2>
+<p>I built an XGBoost model to estimate the probability that one user would like another, using 10,000 historical matches. The features included ordinal-encoded categorical attributes and external information such as university rankings. The model achieved 87% accuracy on the test set used for the project.</p>
+
+<p>I compared explicit pairwise features, including rent-budget overlap, with keeping the two users’ attributes separate and letting the model learn their relationships. The latter approach generalised better in these experiments. That comparison helped determine which compatibility assumptions were useful to encode directly and which were better left to the model. The prediction is directional: someone liking a suggested roommate is different from demonstrating a successful mutual match.</p>

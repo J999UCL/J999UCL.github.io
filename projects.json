@@ -1,0 +1,94 @@
+[
+  {
+    "slug": "tapvid-mv",
+    "title": "TAPVid-MV",
+    "subtitle": "A benchmark for 3D point tracking across multiple moving cameras.",
+    "category": "Research",
+    "tags": "Co-authored paper \u00b7 3D vision \u00b7 Benchmarking",
+    "source": "google/google.tex"
+  },
+  {
+    "slug": "perpetua",
+    "title": "Perpetua",
+    "subtitle": "Synthetic data for multi-view 3D point tracking.",
+    "category": "Research",
+    "tags": "Multi-view tracking \u00b7 Synthetic data",
+    "source": "stripe/stripe.tex"
+  },
+  {
+    "slug": "mvtracker",
+    "aliases": [
+      "mv-tracker++"
+    ],
+    "title": "MV-Tracker fine-tuning",
+    "subtitle": "Adapting a multi-view point tracker with mixed synthetic training data.",
+    "category": "Research",
+    "tags": "PyTorch \u00b7 Distributed training \u00b7 Multi-view tracking",
+    "source": "google/google.tex"
+  },
+  {
+    "slug": "lemon",
+    "title": "Lemon",
+    "subtitle": "A visual and conversational editor for clinical workflows.",
+    "category": "Engineering",
+    "tags": "Agent systems \u00b7 React \u00b7 FastAPI",
+    "source": "figma/figma.tex"
+  },
+  {
+    "slug": "connect4",
+    "title": "3D Connect 4",
+    "subtitle": "A self-play reinforcement learning agent for 4\u00d74\u00d74 Connect 4.",
+    "category": "Machine learning",
+    "tags": "Reinforcement learning \u00b7 C++ \u00b7 PyTorch",
+    "source": "ai_research/ai_research.tex",
+    "aliases": [
+      "rl"
+    ]
+  },
+  {
+    "slug": "skateboard",
+    "title": "Skateboard trick classification",
+    "subtitle": "Classifying skateboard tricks from video.",
+    "category": "Machine learning",
+    "tags": "Video classification \u00b7 PyTorch",
+    "source": "myCV.tex",
+    "aliases": [
+      "skateboardai"
+    ]
+  },
+  {
+    "slug": "loby",
+    "title": "Loby",
+    "subtitle": "Backend engineering and roommate recommendations.",
+    "category": "Engineering",
+    "tags": "Flask \u00b7 SQLAlchemy \u00b7 XGBoost",
+    "source": "google/google.tex"
+  },
+  {
+    "slug": "wall-e",
+    "title": "WALL-E",
+    "subtitle": "Computer-using agents working across Windows virtual machines.",
+    "category": "Engineering",
+    "tags": "Multi-agent systems \u00b7 Azure \u00b7 C#",
+    "source": "figma/figma.tex"
+  },
+  {
+    "slug": "compute-cli",
+    "title": "University compute CLI",
+    "subtitle": "A Python CLI for jobs, environments, and file transfers on UCL machines.",
+    "category": "Engineering",
+    "tags": "Developer tools \u00b7 Python \u00b7 SSH",
+    "source": "stripe/stripe.tex",
+    "aliases": [
+      "ucl-cli"
+    ]
+  },
+  {
+    "slug": "activation-steering",
+    "title": "Activation steering",
+    "subtitle": "Controlling language model behaviour without fine-tuning.",
+    "category": "Machine learning",
+    "tags": "Language models \u00b7 Representation learning",
+    "source": "myCV.tex"
+  }
+]

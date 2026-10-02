@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WALL-E — Jeet Thakwani</title>
+<meta name="description" content="Computer-using agents working across Windows virtual machines.">
+<link rel="canonical" href="https://jeet.thakwani.com/projects/wall-e/">
+<link rel="stylesheet" href="../../plain.css">
+</head>
+<body><nav aria-label="Main navigation"><a href="../../index.html">Home</a><a href="../../projects/">Projects</a><a href="../../CV_Jeet_Thakwani.pdf">CV</a></nav><main><article><header class="article-header"><h1>WALL-E</h1><p class="muted">Multi-agent systems · Azure · C#</p></header><p>WALL-E is a desktop-automation system in which a supervising agent delegates work to agents on separate Windows virtual machines. I built it to explore what a small “virtual office” needs beyond a chat interface: individual desktops, shared results, observable progress and a way to stop or recover work.</p>
+
+<h2>Separate planning from execution</h2>
+<p>The Python/FastAPI backend provisions Azure Windows VMs and coordinates their worker agents. Each VM runs a C# server exposing Windows UI Automation through the Model Context Protocol. Workers can inspect interface elements, click, type, launch applications and capture screenshots. A Guacamole desktop stream lets the user watch the machine directly.</p>
+
+<p>The supervisor handles high-level instructions and delegation; workers handle individual desktops. For structured workflows, a planner produces a dependency graph through a typed tool call. A deterministic scheduler then runs nodes when their dependencies are satisfied, with bounded concurrency, retries, timeouts and cancellation. Results are written to a shared artifact store so later steps can use earlier outputs.</p>
+
+<h2>Keep the work visible</h2>
+<p>I implemented high-level delegation and interruption tools, action verification, and the session plumbing around them. Server-sent events expose progress and tool activity. Persisted event IDs allow a reconnecting client to recover recent activity, while a browser disconnection does not automatically cancel the underlying run. Per-VM chat sessions keep worker details separate from the supervisor conversation.</p>
+
+<p>The main engineering challenge was coordinating application state, remote-machine state and agent state without treating them as one opaque process. Explicit task states and shared results make failures inspectable, while deterministic scheduling keeps dependency and cancellation rules outside the model’s reasoning loop. The repository includes bootstrap and end-to-end tests for the connection and execution paths.</p>
+<p class="back-projects"><a href="../">← All projects</a></p></article></main></body>
+</html>

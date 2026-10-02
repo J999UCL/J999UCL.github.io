@@ -1,0 +1,13 @@
+<p>I built UCL Machine Tools to make the university’s shared GPU machines easier to use from one consistent command line. The repeated work was rarely just “run a script”: first find an available machine, check storage and GPU memory, transfer code, set up the right environment, then recover the logs and outputs later.</p>
+
+<h2>A repeatable remote workflow</h2>
+<p>The Python CLI wraps SSH, rsync and tmux with commands for machine status, environment checks, file transfers and recorded jobs. Short commands run synchronously and preserve the remote exit code. Longer jobs run in explicitly selected tmux sessions, with commands to inspect status, follow logs and fetch results. Job records include source and script identifiers, the selected GPU and execution paths.</p>
+
+<p>For Python projects, a staging step takes an ignore-aware source snapshot and checks the project’s existing lockfile. The snapshot is content-addressed, verified remotely, and paired with a frozen environment. Subsequent launches can reuse that staged environment without uploading everything or resolving dependencies again.</p>
+
+<h2>Handle the details once</h2>
+<p>A substantial part of the work was making transport dependable. Shared machines have different shell setups, and login scripts can print text before a command starts. I added framed SSH transport that separates those startup messages from command output and rsync’s binary protocol. Persistent SSH connections avoid repeated handshakes, while shell handling covers Bash/csh differences and quoting.</p>
+
+<p>Transfers can verify content with SHA-256 and resume partial copies. The test suite covers transport framing, copy reconciliation, job control and staging, with a separate opt-in suite for real university hosts. Fellow students have also used the tool. The result is a smaller set of explicit operations for remote development, with enough recorded state to understand what ran and where.</p>
+
+<p><a href="https://github.com/J999UCL/ucl-machine-tools">Source code and usage examples on GitHub</a></p>

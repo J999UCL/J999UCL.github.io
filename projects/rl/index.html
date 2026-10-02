@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D Connect 4 — Jeet Thakwani</title>
+<meta name="description" content="A self-play reinforcement learning agent for 4×4×4 Connect 4.">
+<link rel="canonical" href="https://jeet.thakwani.com/projects/connect4/">
+<link rel="stylesheet" href="../../plain.css">
+</head>
+<body><nav aria-label="Main navigation"><a href="../../index.html">Home</a><a href="../../projects/">Projects</a><a href="../../CV_Jeet_Thakwani.pdf">CV</a></nav><main><article><header class="article-header"><h1>3D Connect 4</h1><p class="muted">Reinforcement learning · C++ · PyTorch</p></header><p>I built a reinforcement learning agent for gravity-based 4×4×4 Connect 4. Players choose one of 16 columns, and win by making a line of four pieces—including diagonals through the cube. The project combines a learned policy with search: the network suggests promising moves, and tree search looks ahead before choosing one.</p>
+<h2>Learning through search</h2>
+<p>A small 3D ResNet reads two board volumes, one for each player's pieces. Its shared features feed two heads: a policy over the 16 columns and a value estimating the position's outcome. During self-play, PUCT—a form of Monte Carlo tree search—uses those predictions to explore legal continuations. Search visit counts become the next policy targets; completed games provide the value targets.</p>
+<figure>
+  <a href="/assets/projects/connect4/architecture.png"><img src="/assets/projects/connect4/architecture.png" alt="Network architecture: two 4 by 4 by 4 board planes enter a 32-channel convolution and four residual blocks, then split into a 16-move policy head and a scalar value head." loading="lazy"></a>
+  <figcaption>The policy/value network used in the project: four residual blocks and approximately 230,000 parameters.</figcaption>
+</figure>
+<p>I implemented the game and search engine in C++, with compact bitboards, concurrent search on a shared tree, virtual loss to distribute exploration, and batched TorchScript inference. PyTorch handles training. Running several games through one inference service lets the search workers share GPU batches instead of making a separate neural-network call for every position.</p>
+<h2>Curriculum and evaluation</h2>
+<p>I started with a tactical curriculum covering immediate wins, blocks, forks, and legal responses to threats. Board symmetries and varied starting positions broadened the training distribution. I also developed an oracle solver for position analysis, alongside arena matches and depth-limited minimax opponents, so evaluation could examine individual decisions as well as game outcomes.</p>
+<p>The supervised starting model achieved <strong>93.7% top-1 target accuracy on 100,000 held-out tactical positions</strong>. Immediate-win and immediate-block accuracy exceeded 98%, while agreement with depth-three minimax targets was 69.6%. That gap showed why recognising local tactics was only a starting point for learning longer-term play.</p>
+<figure>
+  <a href="/assets/projects/connect4/tactical-evaluation.png"><img src="/assets/projects/connect4/tactical-evaluation.png" alt="Validation and held-out test results across seven tactical categories. Test top-1 target accuracy ranges from 69.6 percent for depth-three minimax to 98.9 percent for immediate blocks." loading="lazy"></a>
+  <figcaption>Recorded curriculum evaluation, before the subsequent self-play rounds. Target accuracy measures agreement with the curriculum labels; it is not a match win rate. Open the chart to inspect the full-size results.</figcaption>
+</figure>
+<p>The main lesson was how much the surrounding system matters: search throughput controls how much experience can be generated, while diverse positions and several evaluation methods make progress easier to judge than matches against the previous checkpoint alone.</p>
+<p class="back-projects"><a href="../">← All projects</a></p></article></main></body>
+</html>

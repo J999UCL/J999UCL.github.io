@@ -1,0 +1,16 @@
+# GitHub Pages builds the static output, not private research notes or old designs.
+exclude:
+  - research
+  - content
+  - scripts
+  - README.md
+  - projects.json
+  - home.css
+  - portfolio.css
+  - sections.css
+  - style.css
+  - app.js
+  - portfolio.js
+  - projects.js
+  - section-nav.js
+  - assets/projects/mvtracker/plot_results.py

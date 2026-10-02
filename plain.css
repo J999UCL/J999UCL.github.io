@@ -39,3 +39,8 @@ figure img { background: #fff; }
 figcaption { margin-top: 10px; color: #595959; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
 .back-projects { border-top: 1px solid #e6e6e6; padding-top: 22px; margin-top: 38px; font-size: 14px; }
 @media (max-width: 600px) { article h1 { font-size: 27px; overflow-wrap: anywhere; } }
+.game-board { max-width: 440px; margin-inline: auto; }
+.supporting-results { margin: 32px 0; border-top: 1px solid #e6e6e6; padding-top: 18px; }
+.supporting-results summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+.supporting-results[open] summary { margin-bottom: 18px; }
+.supporting-results summary:focus-visible { outline: 2px solid #2459a6; outline-offset: 4px; }

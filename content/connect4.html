@@ -1,16 +1,47 @@
-<p>I built a reinforcement learning agent for gravity-based 4×4×4 Connect 4. Players choose one of 16 columns, and win by making a line of four pieces—including diagonals through the cube. The project combines a learned policy with search: the network suggests promising moves, and tree search looks ahead before choosing one.</p>
-<h2>Learning through search</h2>
-<p>A small 3D ResNet reads two board volumes, one for each player's pieces. Its shared features feed two heads: a policy over the 16 columns and a value estimating the position's outcome. During self-play, PUCT—a form of Monte Carlo tree search—uses those predictions to explore legal continuations. Search visit counts become the next policy targets; completed games provide the value targets.</p>
+<p>I built a self-play reinforcement learning agent for gravity-based 4×4×4 Connect 4. There are 16 columns to play into, and a winning line can run horizontally, vertically, or diagonally through the cube. I wanted the bot to learn strong play rather than rely entirely on hand-written rules.</p>
 <figure>
-  <a href="/assets/projects/connect4/architecture.png"><img src="/assets/projects/connect4/architecture.png" alt="Network architecture: two 4 by 4 by 4 board planes enter a 32-channel convolution and four residual blocks, then split into a 16-move policy head and a scalar value head." loading="lazy"></a>
-  <figcaption>The policy/value network used in the project: four residual blocks and approximately 230,000 parameters.</figcaption>
+  <a href="/assets/projects/connect4/board.jpeg"><img class="game-board" src="/assets/projects/connect4/board.jpeg" alt="A physical four-by-four-by-four Connect 4 board, with pieces stacked on sixteen vertical posts." loading="lazy"></a>
+  <figcaption>The game illustrated in my project presentation.</figcaption>
 </figure>
-<p>I implemented the game and search engine in C++, with compact bitboards, concurrent search on a shared tree, virtual loss to distribute exploration, and batched TorchScript inference. PyTorch handles training. Running several games through one inference service lets the search workers share GPU batches instead of making a separate neural-network call for every position.</p>
-<h2>Curriculum and evaluation</h2>
-<p>I started with a tactical curriculum covering immediate wins, blocks, forks, and legal responses to threats. Board symmetries and varied starting positions broadened the training distribution. I also developed an oracle solver for position analysis, alongside arena matches and depth-limited minimax opponents, so evaluation could examine individual decisions as well as game outcomes.</p>
-<p>The supervised starting model achieved <strong>93.7% top-1 target accuracy on 100,000 held-out tactical positions</strong>. Immediate-win and immediate-block accuracy exceeded 98%, while agreement with depth-three minimax targets was 69.6%. That gap showed why recognising local tactics was only a starting point for learning longer-term play.</p>
+<h2>Search and self-play</h2>
+<p>I started with a heuristic opponent that took immediate wins, blocked threats, and avoided obvious traps. This provided training examples and a baseline I could play against through a CLI. I then implemented an AlphaZero-style loop: a policy/value network guides Monte Carlo tree search, self-play generates positions, and the network learns from the search policies and game outcomes.</p>
 <figure>
-  <a href="/assets/projects/connect4/tactical-evaluation.png"><img src="/assets/projects/connect4/tactical-evaluation.png" alt="Validation and held-out test results across seven tactical categories. Test top-1 target accuracy ranges from 69.6 percent for depth-three minimax to 98.9 percent for immediate blocks." loading="lazy"></a>
-  <figcaption>Recorded curriculum evaluation, before the subsequent self-play rounds. Target accuracy measures agreement with the curriculum labels; it is not a match win rate. Open the chart to inspect the full-size results.</figcaption>
+  <a href="/assets/projects/connect4/presentation-network.png"><img src="/assets/projects/connect4/presentation-network.png" alt="A two-plane board input passes through a 32-channel 3D convolution and four residual blocks, then separates into a 16-action policy head and a scalar value head." loading="lazy"></a>
+  <figcaption>Network diagram from slide 5: a small 3D ResNet with four residual blocks and 229,879 trainable parameters. The policy predicts moves; the value estimates the game outcome.</figcaption>
 </figure>
-<p>The main lesson was how much the surrounding system matters: search throughput controls how much experience can be generated, while diverse positions and several evaluation methods make progress easier to judge than matches against the previous checkpoint alone.</p>
+<p>The training objective combines cross-entropy against the MCTS visit distribution with a value loss against the final outcome. The game and PUCT search run in C++, using bitboards; PyTorch trains the network.</p>
+<h2>The cost of looking ahead</h2>
+<p>Search made each training position expensive. In the initial single-threaded, unbatched benchmark, increasing the budget from 32 to 800 simulations per move reduced generation from 18.61 to 1.52 positions per second. Those measurements used a small, randomly initialized network: they measure computational cost, not playing strength.</p>
+<figure>
+  <a href="/assets/projects/connect4/search-throughput.png"><img src="/assets/projects/connect4/search-throughput.png" alt="Initial self-play generation throughput: 18.61 positions per second at 32 simulations, 12.93 at 64, 8.26 at 128, and 1.52 at 800 simulations per move." loading="lazy"></a>
+  <figcaption>Slide 7. The initial search-budget benchmark, before the later parallel and batched implementation.</figcaption>
+</figure>
+<p>I explored parallelism within the search tree and across independent games. Shared-tree search uses virtual loss to spread workers across branches, while a batched TorchScript inference service lets several games share GPU evaluations.</p>
+<h2>Data diversity and symmetry</h2>
+<p>Head-to-head improvements did not tell the whole story. Inspecting the empty-board policy revealed a strong preference for one corner, even though the four corners are equivalent under the board’s symmetries. Diversifying the seed positions and adding symmetry augmentation made the opening distribution much more balanced.</p>
+<figure>
+  <a href="/assets/projects/connect4/policy-symmetry.png"><img src="/assets/projects/connect4/policy-symmetry.png" alt="Before augmentation, one corner receives 70.76 percent of the empty-board policy. After the symmetry repair, the four corners receive approximately 19.6 to 25.9 percent each." loading="lazy"></a>
+  <figcaption>Slide 9. The opening policy before and after the symmetry intervention. A more symmetric distribution is a diagnostic improvement, not by itself a measure of game strength.</figcaption>
+</figure>
+<h2>Evaluating improvement</h2>
+<p>I compared checkpoints with their predecessors, the starting model, and depth-limited alpha-beta opponents. These tests sometimes disagreed: a checkpoint could improve against the starting model while failing the promotion threshold against its predecessor. This made a single rolling opponent an unreliable summary of progress.</p>
+<figure>
+  <a href="/assets/projects/connect4/arena-score-rates.png"><img src="/assets/projects/connect4/arena-score-rates.png" alt="Arena score rates over eleven rounds: scores against the starting model generally rise, while scores against the previous checkpoint fluctuate around a 55 percent promotion threshold." loading="lazy"></a>
+  <figcaption>Slide 10. Recorded arena score rates against the previous checkpoint and the stage-zero model. These are opponent-specific scores, not an overall ranking of playing strength.</figcaption>
+</figure>
+<p>I also built a DAG-based oracle solver that reuses solved positions and caches move evaluations. It provided a way to assess decisions against solved or partially solved positions, rather than relying exclusively on another learned opponent.</p>
+<h2>Curriculum and training direction</h2>
+<p>The final part of the presentation compares expensive MCTS-generated targets with faster actor-critic self-play, and considers an endgame-first curriculum. Starting near the end of a game gives shorter paths to a reward; training can then move back toward openings as competence improves.</p>
+<figure>
+  <a href="/assets/projects/connect4/curriculum-illustration.png"><img src="/assets/projects/connect4/curriculum-illustration.png" alt="Illustrative presentation curves comparing an MCTS-guided attempt, ordinary self-play, and an endgame curriculum. The curves are schematic, not measured training histories." loading="lazy"></a>
+  <figcaption><strong>Illustrative comparison, not measured training curves.</strong> This graphic from slide 12 was constructed for the presentation to explain the training approaches; it also draws on a separate Score Four RL reference implementation. It is not evidence for a final accuracy or win-rate claim.</figcaption>
+</figure>
+<p>The project taught me to treat data generation, policy diagnostics, and evaluation as part of the learning algorithm. More search per move has a cost, beating the last checkpoint is an incomplete test, and diverse training positions matter as much as the network architecture.</p>
+<details class="supporting-results">
+  <summary>Additional result: tactical pretraining</summary>
+  <p>The supervised starting model achieved 93.7% top-1 target accuracy on 100,000 held-out tactical positions. Immediate-win and immediate-block accuracy exceeded 98%, while agreement with depth-three minimax targets was 69.6%. This measures agreement with curriculum labels, not match win rate.</p>
+  <figure>
+    <a href="/assets/projects/connect4/tactical-evaluation.png"><img src="/assets/projects/connect4/tactical-evaluation.png" alt="Validation and held-out test accuracy for seven tactical curriculum categories, ranging from 69.6 to 98.9 percent on the test set." loading="lazy"></a>
+    <figcaption>Recorded curriculum evaluation before the subsequent self-play rounds.</figcaption>
+  </figure>
+</details>
